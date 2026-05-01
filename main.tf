@@ -168,7 +168,7 @@ resource "aws_kms_key" "key" {
         Sid    = "Enable CloudWatch Log"
         Effect = "Allow"
         Principal = {
-          Service = "logs.${data.aws_region.current.name}.amazonaws.com"
+          Service = "logs.${data.aws_region.current.id}.amazonaws.com"
         },
         Action = [
           "kms:Encrypt*",
@@ -333,7 +333,7 @@ resource "aws_iam_policy" "iam_auth" {
       Action = ["rds-db:connect"]
       Effect = "Allow"
       Resource = [for user in var.db_users : format("arn:aws:rds-db:%s:%s:dbuser:%s/%s",
-        data.aws_region.current.name,
+        data.aws_region.current.id,
         data.aws_caller_identity.current.account_id,
         aws_db_instance.rds[0].id,
         user

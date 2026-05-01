@@ -1,5 +1,5 @@
 module "db_instance" {
-  source            = "github.com/wrasdf/terraform-rds?ref=v1.0.1"
+  source            = "github.com/wrasdf/terraform-rds?ref=v1.0.3"
   
   environment       = "labs"
   identifier        = "labs-test-postgres-db"
