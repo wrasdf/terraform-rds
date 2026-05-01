@@ -9,7 +9,6 @@ module "db_instance" {
   identifier        = "labs-test-postgres-db"
   engine            = "postgres"
   engine_version    = "17"     
-  environment       = "labs"
   instance_class    = "db.t4g.large"
   allocated_storage = 20
 
@@ -30,7 +29,6 @@ module "db_instance" {
   identifier                      = "labs-test-postgres"
   engine                          = "postgres"
   engine_version                  = "17"     
-  environment                     = "labs"
   instance_class                  = "db.t4g.micro"
   allocated_storage               = 20
   max_allocated_storage           = 100
@@ -78,7 +76,6 @@ module "db_instance" {
   identifier        = "labs-test-mysql"
   engine            = "mysql"
   engine_version    = "8.0"     
-  environment       = "labs"
   instance_class    = "db.t4g.large"
   allocated_storage = 20
 
