@@ -58,7 +58,7 @@ locals {
   subnets_filter = length(var.subnets_filter) == 0 ? [
     {
       name   = "tag:Name"
-      values = ["${var.environment}-apse2-main-db-*"]
+      values = ["${var.environment}-apse2-main-private-*"]
     }
   ] : var.subnets_filter
 
