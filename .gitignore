@@ -4,4 +4,4 @@
 *.tfstate.backup
 .terraform.tfvars
 terraform.tfstate.d
-plans.tfplan
+plan.tfplan

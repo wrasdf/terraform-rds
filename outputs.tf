@@ -55,7 +55,7 @@ output "db_instance_port" {
 
 output "db_instance_cloudwatch_log_group" {
   description = "Map of CloudWatch log groups created and their attributes"
-  value       = aws_cloudwatch_log_group.log[0].id
+  value       = { for k, v in aws_cloudwatch_log_group.log : k => v.id }
 }
 
 output "db_instance_security_group_id" {

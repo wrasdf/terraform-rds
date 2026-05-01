@@ -350,7 +350,7 @@ variable "options" {
       value = string
     })))
   }))
-  default = null
+  default = []
 }
 
 variable "parameters" {
@@ -360,7 +360,7 @@ variable "parameters" {
     value        = string
     apply_method = optional(string)
   }))
-  default = null
+  default = []
 }
 
 variable "engine_default_only" {
