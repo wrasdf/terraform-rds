@@ -62,7 +62,7 @@ locals {
     }
   ] : var.subnets_filter
 
-  major_engine_version = var.engine == "mysql" || startswith(var.engine, "sqlserver") ? regex("\\d+.\\d+", local.engine_version) : regex("\\d+", local.engine_version)
+  major_engine_version = var.engine == "mysql" || startswith(var.engine, "sqlserver") ? regex("\\d+.\\d+", var.engine_version) : regex("\\d+", var.engine_version)
   monitoring_role_arn  = var.monitoring_interval > 0 ? aws_iam_role.enhanced_monitoring[0].arn : null
 
   final_snapshot_identifier = var.skip_final_snapshot ? null : "${var.identifier}-${try(random_id.snapshot_identifier[0].hex, "")}"

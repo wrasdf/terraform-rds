@@ -68,12 +68,6 @@ variable "kms_key_id" {
   default     = null
 }
 
-variable "license_model" {
-  description = "License model information for this DB instance. Optional, but required for some DB engines, i.e. Oracle SE1"
-  type        = string
-  default     = null
-}
-
 variable "timezone" {
   description = "Time zone of the DB instance. timezone is currently only supported by Microsoft SQL Server. The timezone can only be set on creation. See MSSQL User Guide for more information."
   type        = string
@@ -94,7 +88,7 @@ variable "username" {
 
 variable "port" {
   description = "The port on which the DB accepts connections"
-  type        = string
+  type        = number
   default     = null
 }
 
@@ -102,12 +96,6 @@ variable "iam_database_authentication_enabled" {
   description = "Specifies whether or mappings of AWS Identity and Access Management (IAM) accounts to database accounts is enabled"
   type        = bool
   default     = false
-}
-
-variable "vpc_security_group_ids" {
-  description = "List of VPC security groups to associate"
-  type        = list(string)
-  default     = []
 }
 
 variable "db_subnet_group_name" {
@@ -242,18 +230,6 @@ variable "replica_mode" {
   default     = null
 }
 
-variable "backup_window" {
-  description = "The daily time range (in UTC) during which automated backups are created."
-  type        = string
-  default     = "13:00-14:00"
-}
-
-variable "monitoring_interval" {
-  description = "The interval, in seconds, between points when Enhanced Monitoring metrics are collected for the DB instance. To disable collecting Enhanced Monitoring metrics, specify 0."
-  type        = number
-  default     = 0
-}
-
 variable "database_insights_mode" {
   description = "The mode of Database Insights that is enabled for the instance. Valid values: standard, advanced"
   type        = string
@@ -284,11 +260,6 @@ variable "monitoring_interval" {
   description = "The interval, in seconds, between points when Enhanced Monitoring metrics are collected for the DB instance. To disable collecting Enhanced Monitoring metrics, specify 0."
   type        = number
   default     = 0
-}
-
-variable "apply_immediately" {
-  type    = bool
-  default = null
 }
 
 variable "character_set_name" {
@@ -448,15 +419,8 @@ variable "iam_auth_roles" {
   default     = []
 }
 
-
-
 variable "license_model" {
   description = "License model information for DB instance"
   type        = string
   default     = null
-}
-
-variable "apply_immediately" {
-  type    = bool
-  default = null
 }

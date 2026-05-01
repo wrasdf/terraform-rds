@@ -1,6 +1,5 @@
 resource "aws_db_instance" "rds" {
   count                       = var.create ? 1 : 0  
-  region                      = var.region
 
   identifier                  = var.identifier
   engine                      = local.is_replica ? null : var.engine
@@ -15,7 +14,7 @@ resource "aws_db_instance" "rds" {
 
   db_name                     = var.db_name
   username                    = !local.is_replica ? var.username : null
-  password                    = !local.is_replica ? sensitive(random_string.password.result) : null
+  password                    = !local.is_replica ? sensitive(random_string.password[0].result) : null
   port                        = var.port
   iam_database_authentication_enabled   = var.iam_database_authentication_enabled
 
@@ -60,7 +59,7 @@ resource "aws_db_instance" "rds" {
   backup_retention_period               = var.blue_green_update != null ? coalesce(var.backup_retention_period, 1) : var.backup_retention_period
   backup_window                         = var.backup_window
   monitoring_interval                   = var.monitoring_interval
-  monitoring_role_arn                   = var.monitoring_interval > 0 ? local.monitoring_role_arn : null
+  monitoring_role_arn                   = local.monitoring_role_arn
   database_insights_mode                = var.database_insights_mode
 
   character_set_name                    = var.character_set_name
@@ -111,6 +110,7 @@ resource "aws_db_instance" "rds" {
 }
 
 resource "random_string" "password" {
+  count            = var.create && !local.is_replica ? 1 : 0
   length           = 16
   special          = true
   override_special = "-"
@@ -191,7 +191,7 @@ resource "aws_kms_alias" "alias" {
 
 resource "aws_db_option_group" "option" {
   count                = var.create ? 1 : 0
-  name                 = "${var.identifier}-group"
+  name                 = "${var.identifier}-option-group"
   engine_name          = var.engine
   major_engine_version = local.major_engine_version
   tags                 = merge(var.tags, var.db_instance_tags)
@@ -231,7 +231,7 @@ resource "aws_db_option_group" "option" {
 
 resource "aws_db_parameter_group" "parameter" {
   count  = var.create ? 1 : 0
-  name   = "${var.identifier}-group"
+  name   = "${var.identifier}-parameter-group"
   family = data.aws_rds_engine_version.engine.parameter_group_family
   tags   = merge(var.tags, var.db_instance_tags)
 
@@ -257,8 +257,7 @@ resource "aws_db_subnet_group" "subnet" {
 }
 
 resource "aws_cloudwatch_log_group" "log" {
-  count             = var.create ? 1 : 0
-  for_each          = toset(var.enabled_cloudwatch_logs_exports)
+  for_each          = var.create ? toset(var.enabled_cloudwatch_logs_exports) : []
 
   name              = "/aws/rds/instance/${var.identifier}/${each.value}"
   retention_in_days = contains(["prod"], var.environment) ? 30 : 7
@@ -267,7 +266,7 @@ resource "aws_cloudwatch_log_group" "log" {
 }
 
 resource "aws_ssm_parameter" "username" {
-  count  = var.create ? 1 : 0
+  count = var.create && !local.is_replica ? 1 : 0
   name   = "/rds/database/${var.identifier}/username"
   type   = "SecureString"
   value  = sensitive(var.username == null ? "master" : var.username)
@@ -276,10 +275,10 @@ resource "aws_ssm_parameter" "username" {
 }
 
 resource "aws_ssm_parameter" "password" {
-  count  = var.create ? 1 : 0
+  count = var.create && !local.is_replica ? 1 : 0
   name   = "/rds/database/${var.identifier}/password"
   type   = "SecureString"
-  value  = sensitive(random_string.password.result)
+  value  = sensitive(random_string.password[0].result)
   key_id = var.kms_key_id != null ? var.kms_key_id : (aws_kms_key.key[0].arn)
   tags   = merge(var.tags, var.db_instance_tags)
 }
@@ -295,7 +294,7 @@ resource "aws_security_group" "sg" {
 resource "aws_security_group_rule" "egress" {
   count             = var.create ? 1 : 0
   from_port         = 0
-  protocol          = "tcp"
+  protocol          = "-1"
   security_group_id = aws_security_group.sg[0].id
   to_port           = 0
   type              = "egress"
@@ -313,8 +312,7 @@ resource "aws_security_group_rule" "ingress" {
 }
 
 resource "aws_security_group_rule" "allow_sg" {
-  count    = var.create ? 1 : 0
-  for_each = toset(var.allow_sg_ids)
+  for_each = var.create ? toset(var.allow_sg_ids) : []
 
   from_port                = var.port
   protocol                 = "tcp"
@@ -345,8 +343,7 @@ resource "aws_iam_policy" "iam_auth" {
 }
 
 resource "aws_iam_role_policy_attachment" "iam_auth" {
-  count       = var.create && length(var.db_users) > 0 ? length(var.iam_auth_roles) : 0
-  for_each    = toset(var.iam_auth_roles)
+  for_each    = var.create && length(var.db_users) > 0 ? toset(var.iam_auth_roles) : []
 
   policy_arn  = aws_iam_policy.iam_auth[0].arn
   role        = each.value
