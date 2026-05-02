@@ -1,36 +1,36 @@
 resource "aws_db_instance" "rds" {
-  count                       = var.create ? 1 : 0  
+  count = var.create ? 1 : 0
 
-  identifier                  = var.identifier
-  engine                      = local.is_replica ? null : var.engine
-  engine_version              = var.engine_version
-  instance_class              = var.instance_class
-  allocated_storage           = var.allocated_storage
-  max_allocated_storage       = var.max_allocated_storage
-  storage_type                = var.storage_type
-  storage_encrypted           = var.storage_encrypted
-  kms_key_id                  = var.kms_key_id != null ? var.kms_key_id : (aws_kms_key.key[0].arn)  
-  timezone                    = var.timezone
+  identifier            = var.identifier
+  engine                = local.is_replica ? null : var.engine
+  engine_version        = var.engine_version
+  instance_class        = var.instance_class
+  allocated_storage     = var.allocated_storage
+  max_allocated_storage = var.max_allocated_storage
+  storage_type          = var.storage_type
+  storage_encrypted     = var.storage_encrypted
+  kms_key_id            = var.kms_key_id != null ? var.kms_key_id : (aws_kms_key.key[0].arn)
+  timezone              = var.timezone
 
-  db_name                     = var.db_name
-  username                    = !local.is_replica ? var.username : null
-  password                    = !local.is_replica ? sensitive(random_string.password[0].result) : null
-  port                        = var.port
-  iam_database_authentication_enabled   = var.iam_database_authentication_enabled
+  db_name                             = var.db_name
+  username                            = !local.is_replica ? var.username : null
+  password                            = !local.is_replica ? sensitive(random_string.password[0].result) : null
+  port                                = var.port
+  iam_database_authentication_enabled = var.iam_database_authentication_enabled
 
-  vpc_security_group_ids      = compact(concat(var.vpc_security_group_ids, [aws_security_group.sg[0].id]))
-  db_subnet_group_name        = var.db_subnet_group_name != null ? var.db_subnet_group_name : aws_db_subnet_group.subnet[0].id
-  parameter_group_name        = var.parameter_group_name != null ? var.parameter_group_name : aws_db_parameter_group.parameter[0].id
-  option_group_name           = var.option_group_name != null ? var.option_group_name : aws_db_option_group.option[0].id
-  network_type                = var.network_type
+  vpc_security_group_ids = compact(concat(var.vpc_security_group_ids, [aws_security_group.sg[0].id]))
+  db_subnet_group_name   = var.db_subnet_group_name != null ? var.db_subnet_group_name : aws_db_subnet_group.subnet[0].id
+  parameter_group_name   = var.parameter_group_name != null ? var.parameter_group_name : aws_db_parameter_group.parameter[0].id
+  option_group_name      = var.option_group_name != null ? var.option_group_name : aws_db_option_group.option[0].id
+  network_type           = var.network_type
 
-  availability_zone           = var.availability_zone
-  multi_az                    = var.multi_az
-  iops                        = var.iops
-  storage_throughput          = var.storage_throughput
-  publicly_accessible         = var.publicly_accessible
-  ca_cert_identifier          = var.ca_cert_identifier
-  upgrade_storage_config      = var.upgrade_storage_config
+  availability_zone      = var.availability_zone
+  multi_az               = var.multi_az
+  iops                   = var.iops
+  storage_throughput     = var.storage_throughput
+  publicly_accessible    = var.publicly_accessible
+  ca_cert_identifier     = var.ca_cert_identifier
+  upgrade_storage_config = var.upgrade_storage_config
 
   allow_major_version_upgrade = var.allow_major_version_upgrade
   auto_minor_version_upgrade  = var.auto_minor_version_upgrade
@@ -44,30 +44,30 @@ resource "aws_db_instance" "rds" {
     content {
       enabled = blue_green_update.value.enabled
     }
-  } 
+  }
 
-  snapshot_identifier                   = var.snapshot_identifier
-  copy_tags_to_snapshot                 = var.copy_tags_to_snapshot
-  skip_final_snapshot                   = var.skip_final_snapshot
-  final_snapshot_identifier             = local.final_snapshot_identifier
-  
+  snapshot_identifier       = var.snapshot_identifier
+  copy_tags_to_snapshot     = var.copy_tags_to_snapshot
+  skip_final_snapshot       = var.skip_final_snapshot
+  final_snapshot_identifier = local.final_snapshot_identifier
+
   performance_insights_enabled          = var.performance_insights_enabled
   performance_insights_retention_period = contains(["prod", "sand"], var.environment) ? var.performance_insights_retention_period : null
 
-  replicate_source_db                   = var.replicate_source_db
-  replica_mode                          = var.replica_mode
-  backup_retention_period               = var.blue_green_update != null ? coalesce(var.backup_retention_period, 1) : var.backup_retention_period
-  backup_window                         = var.backup_window
-  monitoring_interval                   = var.monitoring_interval
-  monitoring_role_arn                   = local.monitoring_role_arn
-  database_insights_mode                = var.database_insights_mode
+  replicate_source_db     = var.replicate_source_db
+  replica_mode            = var.replica_mode
+  backup_retention_period = var.blue_green_update != null ? coalesce(var.backup_retention_period, 1) : var.backup_retention_period
+  backup_window           = var.backup_window
+  monitoring_interval     = var.monitoring_interval
+  monitoring_role_arn     = local.monitoring_role_arn
+  database_insights_mode  = var.database_insights_mode
 
-  character_set_name                    = var.character_set_name
-  nchar_character_set_name              = var.nchar_character_set_name
-  enabled_cloudwatch_logs_exports       = var.enabled_cloudwatch_logs_exports
+  character_set_name              = var.character_set_name
+  nchar_character_set_name        = var.nchar_character_set_name
+  enabled_cloudwatch_logs_exports = var.enabled_cloudwatch_logs_exports
 
-  deletion_protection                   = contains(["prod", "sand"], var.environment) ? var.deletion_protection : false
-  delete_automated_backups              = var.delete_automated_backups
+  deletion_protection      = contains(["prod", "sand"], var.environment) ? var.deletion_protection : false
+  delete_automated_backups = var.delete_automated_backups
 
   dynamic "restore_to_point_in_time" {
     for_each = var.restore_to_point_in_time != null ? [var.restore_to_point_in_time] : []
@@ -93,8 +93,8 @@ resource "aws_db_instance" "rds" {
     }
   }
 
-  license_model            = var.license_model
-  tags                     = merge(var.tags, var.db_instance_tags)
+  license_model = var.license_model
+  tags          = local.tags
 
 
   dynamic "timeouts" {
@@ -117,7 +117,7 @@ resource "random_string" "password" {
 }
 
 resource "aws_kms_key" "key" {
-  count                   = var.create && var.kms_key_id == null ? 1 : 0 
+  count                   = var.create && var.kms_key_id == null ? 1 : 0
   description             = "RDS ${var.identifier} key"
   enable_key_rotation     = true
   deletion_window_in_days = 10
@@ -184,7 +184,7 @@ resource "aws_kms_key" "key" {
 }
 
 resource "aws_kms_alias" "alias" {
-  count         = var.create && var.kms_key_id == null ? 1 : 0   
+  count         = var.create && var.kms_key_id == null ? 1 : 0
   name          = "alias/${var.identifier}"
   target_key_id = aws_kms_key.key[0].key_id
 }
@@ -194,7 +194,7 @@ resource "aws_db_option_group" "option" {
   name                 = "${var.identifier}-option-group"
   engine_name          = var.engine
   major_engine_version = local.major_engine_version
-  tags                 = merge(var.tags, var.db_instance_tags)
+  tags                 = local.tags
 
   dynamic "option" {
     for_each = var.options
@@ -226,14 +226,14 @@ resource "aws_db_option_group" "option" {
   lifecycle {
     create_before_destroy = true
   }
-  
+
 }
 
 resource "aws_db_parameter_group" "parameter" {
   count  = var.create ? 1 : 0
   name   = "${var.identifier}-parameter-group"
   family = data.aws_rds_engine_version.engine.parameter_group_family
-  tags   = merge(var.tags, var.db_instance_tags)
+  tags   = local.tags
 
   dynamic "parameter" {
     for_each = var.parameters
@@ -253,29 +253,29 @@ resource "aws_db_subnet_group" "subnet" {
   count      = var.create ? 1 : 0
   name       = "${var.identifier}-subnets"
   subnet_ids = data.aws_subnets.subnets.ids
-  tags       = merge(var.tags, var.db_instance_tags)
+  tags       = local.tags
 }
 
 resource "aws_cloudwatch_log_group" "log" {
-  for_each          = var.create ? toset(var.enabled_cloudwatch_logs_exports) : []
+  for_each = var.create ? toset(var.enabled_cloudwatch_logs_exports) : []
 
   name              = "/aws/rds/instance/${var.identifier}/${each.value}"
   retention_in_days = contains(["prod"], var.environment) ? 30 : 7
   kms_key_id        = var.kms_key_id != null ? var.kms_key_id : (aws_kms_key.key[0].arn)
-  tags              = merge(var.tags, var.db_instance_tags)
+  tags              = local.tags
 }
 
 resource "aws_ssm_parameter" "username" {
-  count = var.create && !local.is_replica ? 1 : 0
+  count  = var.create && !local.is_replica ? 1 : 0
   name   = "/rds/database/${var.identifier}/username"
   type   = "SecureString"
   value  = sensitive(var.username == null ? "master" : var.username)
   key_id = var.kms_key_id != null ? var.kms_key_id : (aws_kms_key.key[0].arn)
-  tags   = merge(var.tags, var.db_instance_tags)
+  tags   = local.tags
 }
 
 resource "aws_ssm_parameter" "password" {
-  count = var.create && !local.is_replica ? 1 : 0
+  count  = var.create && !local.is_replica ? 1 : 0
   name   = "/rds/database/${var.identifier}/password"
   type   = "SecureString"
   value  = sensitive(random_string.password[0].result)
@@ -343,10 +343,10 @@ resource "aws_iam_policy" "iam_auth" {
 }
 
 resource "aws_iam_role_policy_attachment" "iam_auth" {
-  for_each    = var.create && length(var.db_users) > 0 ? toset(var.iam_auth_roles) : []
+  for_each = var.create && length(var.db_users) > 0 ? toset(var.iam_auth_roles) : []
 
-  policy_arn  = aws_iam_policy.iam_auth[0].arn
-  role        = each.value
+  policy_arn = aws_iam_policy.iam_auth[0].arn
+  role       = each.value
 }
 
 ################################################################################

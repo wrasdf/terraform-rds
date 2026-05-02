@@ -1,4 +1,4 @@
-# terraform RDS
+# Terraform RDS
 
 - Example 1
 ```

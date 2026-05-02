@@ -1,0 +1,47 @@
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.6.0
+  hooks:
+  # Git style
+  - id: check-added-large-files
+  - id: check-merge-conflict
+
+  # Common errors
+  - id: end-of-file-fixer
+  - id: trailing-whitespace
+    args: [--markdown-linebreak-ext=md]
+    exclude: README.md
+  - id: check-yaml
+  - id: check-merge-conflict
+  - id: check-executables-have-shebangs
+
+  # Security
+  - id: detect-aws-credentials
+    args: ['--allow-missing-credentials']
+  - id: detect-private-key
+
+- repo: https://github.com/igorshubovych/markdownlint-cli
+  rev: v0.41.0
+  hooks:
+  - id: markdownlint
+    args:
+    - "**/*.md"
+    - "--ignore"
+    - "**/.terraform"
+
+- repo: https://github.com/antonbabenko/pre-commit-terraform
+  rev: v1.92.0
+  hooks:
+  - id: terraform_fmt
+    files: \.(tf|tfvars|hcl)$
+    args:
+    - --args=-no-color
+    - --args=-diff
+  - id: terraform_docs
+    args:
+    - "markdown"
+    - "."
+  - id: terraform_tflint
+    files: \.(tf|tfvars|hcl)$
+    args:
+    - --args=--config=__GIT_WORKING_DIR__/.tflint.hcl

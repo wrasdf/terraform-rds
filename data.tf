@@ -66,6 +66,7 @@ locals {
   monitoring_role_arn  = var.monitoring_interval > 0 ? aws_iam_role.enhanced_monitoring[0].arn : null
 
   final_snapshot_identifier = var.skip_final_snapshot ? null : "${var.identifier}-${try(random_id.snapshot_identifier[0].hex, "")}"
-  is_replica = var.replicate_source_db != null
+  is_replica                = var.replicate_source_db != null
+  tags                      = merge(var.tags, var.db_instance_tags, { terraform-modules = "rds" })
 
 }

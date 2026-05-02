@@ -11,7 +11,7 @@ terraform init \
 
 terraform workspace new labs-apse2-main || true
 terraform workspace select labs-apse2-main
-terraform workspace show  
+terraform workspace show
 
 # terraform plan -out plan.tfplan
 # terraform apply -input=false plan.tfplan
