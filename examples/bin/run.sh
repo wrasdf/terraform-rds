@@ -13,5 +13,8 @@ terraform workspace new labs-apse2-main || true
 terraform workspace select labs-apse2-main
 terraform workspace show  
 
-terraform plan -out plan.tfplan
+# terraform plan -out plan.tfplan
 # terraform apply -input=false plan.tfplan
+
+terraform plan -destroy -out=destroy.tfplan
+terraform apply "destroy.tfplan"
