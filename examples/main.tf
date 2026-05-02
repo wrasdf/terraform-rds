@@ -1,5 +1,6 @@
 module "db_instance" {
-  source            = "github.com/wrasdf/terraform-rds?ref=v1.0.5"
+  source            = "../"
+  # source            = "github.com/wrasdf/terraform-rds?ref=v1.0.5"
   
   environment       = "labs"
   identifier        = "labs-test-postgres-db"
@@ -15,7 +16,8 @@ module "db_instance" {
 }
 
 module "db_instance_mysql" {
-  source            = "github.com/wrasdf/terraform-rds?ref=v1.0.4"
+  source            = "../"
+  # source            = "github.com/wrasdf/terraform-rds?ref=v1.0.5"  
   
   environment       = "labs"
   identifier        = "labs-test-mysql"
